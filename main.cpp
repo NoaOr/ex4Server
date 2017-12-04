@@ -1,6 +1,12 @@
 #include <iostream>
+#include "Server.h"
+using namespace std;
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    Server server(8000);
+    try {
+        server.start();
+    } catch (char *msg) {
+        cout << "by";
+    }
 }

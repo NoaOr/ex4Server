@@ -1,0 +1,106 @@
+//
+// Created by noa on 04/12/17.
+//
+#include <iostream>
+#include <sys/socket.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <unistd.h>
+#include "Server.h"
+using namespace std;
+#define MAX_CONNECTED_CLIENTS 2
+
+Server::Server(int port): port(port), serverSocket(0) {
+    cout << "server constructor" << endl;
+}
+void Server::start() {
+    // Create a socket point
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1) {
+        throw "Error opening socket";
+    }
+    // Assign a local address to the socket
+    struct sockaddr_in serverAddress;
+    bzero((void *)&serverAddress,
+          sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(port);
+    if (bind(serverSocket, (struct sockaddr
+    *)&serverAddress, sizeof(serverAddress)) == -1) {
+        throw "Error on binding";
+    }
+    // Start listening to incoming connections
+    listen(serverSocket, MAX_CONNECTED_CLIENTS);
+    // Define the client socket's structures
+    struct sockaddr_in clientAddress;
+    socklen_t clientAddressLen;
+    while (true) {
+        cout << "Waiting for client connections..." << endl;
+        // Accept a new client connection
+        int clientSocket1 = accept(serverSocket, (struct
+                sockaddr *)&clientAddress, &clientAddressLen);
+        cout << "Client connected" << endl;
+        if (clientSocket1 == -1) {
+            throw "Error on accept";
+        }
+        int clientSocket2 = accept(serverSocket, (struct
+                sockaddr *)&clientAddress, &clientAddressLen);
+        cout << "Client connected" << endl;
+        if (clientSocket2 == -1) {
+            throw "Error on accept";
+        }
+
+        handleClients(clientSocket1, clientSocket2);
+        // Close communication with the client
+        close(clientSocket1);
+        close(clientSocket2);
+    }
+}
+
+
+void Server ::handleClients(int clientSocket1, int clientSocket2) {
+    int value1 = 1, value2= 2;
+    int buffer[2];
+    ssize_t n = write(clientSocket1, &value1, sizeof(value1));
+    if (n == -1) {
+        throw "Error writing to socket";
+    }
+    n = write(clientSocket2, &value2, sizeof(value2));
+    if (n == -1) {
+        throw "Error writing to socket";
+    }
+    while (true) {
+        // read the first client's choice
+        n = read(clientSocket1, &buffer, sizeof(buffer));
+        if (n == -1) {
+            throw "Error reading from socket";
+        }
+        if (n == 0) {
+            cout << "client disconnected" << endl;
+            return;
+        }
+
+        n = write(clientSocket2, &buffer, sizeof(buffer));
+        if (n == -1) {
+            throw "Error writing to socket";
+        }
+        // read the second client's choice
+
+        n = read(clientSocket2, &buffer, sizeof(buffer));
+        if (n == -1) {
+            throw "Error reading from socket";
+        }
+        if (n == 0) {
+            cout << "client disconnected" << endl;
+            return;
+        }
+        n = write(clientSocket1, &buffer, sizeof(buffer));
+        if (n == -1) {
+            throw "Error writing to socket";
+        }
+
+
+    }
+}

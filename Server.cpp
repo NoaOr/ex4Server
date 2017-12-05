@@ -3,7 +3,6 @@
 //
 #include <iostream>
 #include <sys/socket.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
@@ -12,7 +11,7 @@ using namespace std;
 #define MAX_CONNECTED_CLIENTS 2
 
 Server::Server(int port): port(port), serverSocket(0) {
-    cout << "server constructor" << endl;
+//    cout << "server constructor" << endl;
 }
 void Server::start() {
     // Create a socket point
@@ -27,8 +26,7 @@ void Server::start() {
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     serverAddress.sin_port = htons(port);
-    if (bind(serverSocket, (struct sockaddr
-    *)&serverAddress, sizeof(serverAddress)) == -1) {
+    if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1) {
         throw "Error on binding";
     }
     // Start listening to incoming connections
@@ -45,8 +43,20 @@ void Server::start() {
         if (clientSocket1 == -1) {
             throw "Error on accept";
         }
+
+        char msg1 [300] = "Waiting for another player to connect...";
+
+        int n = write(clientSocket1, &msg1, sizeof(msg1));
+        if (n == -1) {
+            throw "Error in writing to socket";
+        }
         int clientSocket2 = accept(serverSocket, (struct
                 sockaddr *)&clientAddress, &clientAddressLen);
+
+
+        char msg2 [300] = "Connected successfully";
+
+        n = write(clientSocket2, &msg2, sizeof(msg2));
         cout << "Client connected" << endl;
         if (clientSocket2 == -1) {
             throw "Error on accept";
@@ -62,7 +72,12 @@ void Server::start() {
 
 void Server ::handleClients(int clientSocket1, int clientSocket2) {
     int value1 = 1, value2= 2;
+    bool isFirstTurn = true;
     int buffer[2];
+    char waitingMsg[300] = "Waiting for the other player to respond";
+    char firstMsg[300] = "First turn";
+    int firstTurnBuff[2] = {-1, -1};
+    // writing the value to each player
     ssize_t n = write(clientSocket1, &value1, sizeof(value1));
     if (n == -1) {
         throw "Error writing to socket";
@@ -72,6 +87,26 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
         throw "Error writing to socket";
     }
     while (true) {
+        if (isFirstTurn) {
+            n = write(clientSocket1, &firstTurnBuff, sizeof(firstTurnBuff));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+            n = write(clientSocket1, &firstMsg, sizeof(firstMsg));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+            isFirstTurn = false;
+        } else {
+            n = write(clientSocket1, &buffer, sizeof(buffer));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+        }
+        n = write(clientSocket2, &waitingMsg, sizeof(waitingMsg));
+        if (n == -1) {
+            throw "Error writing to socket";
+        }
         // read the first client's choice
         n = read(clientSocket1, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -86,8 +121,11 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
         if (n == -1) {
             throw "Error writing to socket";
         }
+        n = write(clientSocket1, &waitingMsg, sizeof(waitingMsg));
+        if (n == -1) {
+            throw "Error writing to socket";
+        }
         // read the second client's choice
-
         n = read(clientSocket2, &buffer, sizeof(buffer));
         if (n == -1) {
             throw "Error reading from socket";
@@ -96,11 +134,6 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
             cout << "client disconnected" << endl;
             return;
         }
-        n = write(clientSocket1, &buffer, sizeof(buffer));
-        if (n == -1) {
-            throw "Error writing to socket";
-        }
-
 
     }
 }

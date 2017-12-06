@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "Server.h"
+#include "errno.h"
 using namespace std;
 #define MAX_CONNECTED_CLIENTS 2
 
@@ -27,20 +28,22 @@ void Server::start() {
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     serverAddress.sin_port = htons(port);
     if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1) {
+        cout<<"errno binding"<<errno;
         throw "Error on binding";
     }
     // Start listening to incoming connections
     listen(serverSocket, MAX_CONNECTED_CLIENTS);
     // Define the client socket's structures
     struct sockaddr_in clientAddress;
-    socklen_t clientAddressLen;
+    socklen_t clientAddressLen = sizeof((struct sockaddr*) &clientAddress);
     while (true) {
         cout << "Waiting for client connections..." << endl;
         // Accept a new client connection
-        int clientSocket1 = accept(serverSocket, (struct
-                sockaddr *)&clientAddress, &clientAddressLen);
+        int clientSocket1 = accept(serverSocket, (struct sockaddr*)
+                &clientAddress, &clientAddressLen);
         cout << "Client connected" << endl;
         if (clientSocket1 == -1) {
+            cout<<"errno accept"<<errno;
             throw "Error on accept";
         }
 
@@ -76,7 +79,9 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
     int buffer[2];
     char waitingMsg[300] = "Waiting for the other player to respond";
     char firstMsg[300] = "First turn";
-    int firstTurnBuff[2] = {-1, -1};
+    int firstTurnBuff[2];
+    firstTurnBuff[0] = -1;
+    firstTurnBuff[1] = -1;
     // writing the value to each player
     ssize_t n = write(clientSocket1, &value1, sizeof(value1));
     if (n == -1) {
@@ -88,11 +93,11 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
     }
     while (true) {
         if (isFirstTurn) {
-            n = write(clientSocket1, &firstTurnBuff, sizeof(firstTurnBuff));
+            n = write(clientSocket1, &firstMsg, sizeof(firstMsg));
             if (n == -1) {
                 throw "Error writing to socket";
             }
-            n = write(clientSocket1, &firstMsg, sizeof(firstMsg));
+            n = write(clientSocket1, &firstTurnBuff, sizeof(firstTurnBuff));
             if (n == -1) {
                 throw "Error writing to socket";
             }

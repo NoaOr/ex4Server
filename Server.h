@@ -11,6 +11,8 @@ public:
     Server(int port);
     void start();
     void stop();
+    bool isEndMessage(int *buffer);
+    bool isNoMoveMessage(int *buffer);
 private:
     int port;
     int serverSocket; // the socket's file descriptor

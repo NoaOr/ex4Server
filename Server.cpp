@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include "Server.h"
 #include "errno.h"
+#include <stdlib.h>
+
 using namespace std;
 #define MAX_CONNECTED_CLIENTS 2
 
@@ -76,6 +78,7 @@ void Server::start() {
 void Server ::handleClients(int clientSocket1, int clientSocket2) {
     int value1 = 1, value2= 2;
     bool isFirstTurn = true;
+    bool player1hasMove = true;
     int buffer[2];
     char waitingMsg[300] = "Waiting for the other player to respond";
     char firstMsg[300] = "First turn";
@@ -117,6 +120,12 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
         if (n == -1) {
             throw "Error reading from socket";
         }
+        if (isEndMessage(buffer)) {
+            break;
+        }
+        if (isNoMoveMessage(buffer)) {
+            player1hasMove = false;
+        }
         if (n == 0) {
             cout << "client disconnected" << endl;
             return;
@@ -135,10 +144,42 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
         if (n == -1) {
             throw "Error reading from socket";
         }
+        if (isEndMessage(buffer)) {
+            break;
+        }
+        if (isNoMoveMessage(buffer) && !player1hasMove) {
+            char endGame[4] = "End";
+            n = write(clientSocket1, &endGame, sizeof(endGame));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+            n = write(clientSocket2, &endGame, sizeof(endGame));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+            break;
+        }
         if (n == 0) {
             cout << "client disconnected" << endl;
             return;
         }
 
     }
+}
+
+bool Server::isEndMessage(int *buffer) {
+    char *str = (char*) buffer;
+    if (strcmp(str, "End") == 0) {
+        return true;
+    }
+    return false;
+
+}
+
+bool Server::isNoMoveMessage(int *buffer) {
+    char *str = (char*) buffer;
+    if (strcmp(str, "NoMove") == 0) {
+        return true;
+    }
+    return false;
 }

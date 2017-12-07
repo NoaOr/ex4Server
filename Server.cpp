@@ -163,7 +163,7 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
             cout << "client disconnected" << endl;
             return;
         }
-
+        player1hasMove = true;
     }
 }
 

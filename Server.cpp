@@ -145,6 +145,10 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
         if (n == -1) {
             throw "Error reading from socket";
         }
+        if (n == 0) {
+            cout << "client disconnected" << endl;
+            return;
+        }
         if (isEndMessage(buffer)) {
             break;
         }

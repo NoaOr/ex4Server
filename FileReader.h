@@ -9,8 +9,17 @@ using namespace std;
 
 class FileReader {
 public:
+    /**
+     * Constructor
+     * @param fileName
+     */
     FileReader(char *fileName);
+    /**
+     *
+     * @return the server IP
+     */
     string getIP();
+
     int getPort();
 private:
     string IP;

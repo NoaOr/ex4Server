@@ -8,10 +8,30 @@
 
 class Server {
 public:
+    /**
+     * Constructor
+     * @param port - the port
+     */
     Server(int port);
+    /**
+     * start function
+     */
     void start();
+    /**
+     * stop function
+     */
     void stop();
+    /**
+     * This function checks if the received message is an end message
+     * @param buffer - the buffer
+     * @return - boolean
+     */
     bool isEndMessage(int *buffer);
+    /**
+     * This function checks if the received message is a no move message
+     * @param buffer - the buffer
+     * @return - boolean
+     */
     bool isNoMoveMessage(int *buffer);
 private:
     int port;

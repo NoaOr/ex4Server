@@ -37,7 +37,8 @@ void Server::start() {
     listen(serverSocket, MAX_CONNECTED_CLIENTS);
     // Define the client socket's structures
     struct sockaddr_in clientAddress;
-    socklen_t clientAddressLen = sizeof((struct sockaddr*) &clientAddress);
+    //socklen_t clientAddressLen = sizeof((struct sockaddr*) &clientAddress);
+    socklen_t clientAddressLen = sizeof(struct sockaddr);
     while (true) {
         cout << "Waiting for client connections..." << endl;
         // Accept a new client connection

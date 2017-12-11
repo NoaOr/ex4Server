@@ -7,11 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 #include "Server.h"
-#include "errno.h"
-#include <stdlib.h>
-
 using namespace std;
 #define MAX_CONNECTED_CLIENTS 2
+#define MAX_MSG_LEN 300
+#define END_SIZE 4
 
 Server::Server(int port): port(port), serverSocket(0) {
 //    cout << "server constructor" << endl;
@@ -30,7 +29,6 @@ void Server::start() {
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     serverAddress.sin_port = htons(port);
     if (bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1) {
-        cout<<"errno binding"<<errno;
         throw "Error on binding";
     }
     // Start listening to incoming connections
@@ -46,11 +44,10 @@ void Server::start() {
                 &clientAddress, &clientAddressLen);
         cout << "Client connected" << endl;
         if (clientSocket1 == -1) {
-            cout<<"errno accept"<<errno;
             throw "Error on accept";
         }
 
-        char msg1 [300] = "Waiting for another player to connect...";
+        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
 
         int n = write(clientSocket1, &msg1, sizeof(msg1));
         if (n == -1) {
@@ -60,7 +57,7 @@ void Server::start() {
                 sockaddr *)&clientAddress, &clientAddressLen);
 
 
-        char msg2 [300] = "Connected successfully";
+        char msg2 [MAX_MSG_LEN] = "Connected successfully";
 
         n = write(clientSocket2, &msg2, sizeof(msg2));
         cout << "Client connected" << endl;
@@ -81,8 +78,8 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
     bool isFirstTurn = true;
     bool player1hasMove = true;
     int buffer[2];
-    char waitingMsg[300] = "Waiting for the other player to respond";
-    char firstMsg[300] = "First turn";
+    char waitingMsg[MAX_MSG_LEN] = "Waiting for the other player to respond";
+    char firstMsg[MAX_MSG_LEN] = "First turn";
     int firstTurnBuff[2];
     firstTurnBuff[0] = -1;
     firstTurnBuff[1] = -1;
@@ -153,7 +150,7 @@ void Server ::handleClients(int clientSocket1, int clientSocket2) {
             break;
         }
         if (isNoMoveMessage(buffer) && !player1hasMove) {
-            char endGame[4] = "End";
+            char endGame[END_SIZE] = "End";
             n = write(clientSocket1, &endGame, sizeof(endGame));
             if (n == -1) {
                 throw "Error writing to socket";

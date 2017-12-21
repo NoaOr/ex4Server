@@ -13,7 +13,8 @@ using namespace std;
 #define END_SIZE 4
 
 Server::Server(int port): port(port), serverSocket(0) {
-//    cout << "server constructor" << endl;
+    this->pthreadList = list <pthread_t>();
+    this->pthreadMap = map <string, pthread_t>();
 }
 void Server::start() {
     // Create a socket point
@@ -184,4 +185,8 @@ bool Server::isNoMoveMessage(int *buffer) {
         return true;
     }
     return false;
+}
+
+map <string, pthread_t> Server::getPthreadMap() {
+   return this->pthreadMap;
 }

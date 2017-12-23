@@ -4,6 +4,8 @@
 
 #include "Command.h"
 
-virtual Command :: Command (Server* server) {
+Command :: Command (Server *server) {
     this->server = server;
+}
+Command::~Command() {
 }

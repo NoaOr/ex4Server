@@ -6,17 +6,24 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
+#include <iterator>
+#include <sstream>
 #include "Server.h"
 using namespace std;
+
 #define MAX_CONNECTED_CLIENTS 2
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
 
 Server::Server(int port): port(port), serverSocket(0) {
-    this->pthreadList = list <pthread_t>();
-    this->pthreadMap = map <string, pthread_t>();
+//    this->pthreadList = list <pthread_t>();
+//    this->pthreadMap = map <string, pthread_t>();
+    this->gamesList = list <Game> ();
+//    this->commandsManager = new CommandsManager(this);
 }
 void Server::start() {
+    CommandsManager commandsManager = CommandsManager(this);
+    string buffer;
     // Create a socket point
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -47,29 +54,43 @@ void Server::start() {
         if (clientSocket1 == -1) {
             throw "Error on accept";
         }
-
-        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
-
-        int n = write(clientSocket1, &msg1, sizeof(msg1));
+        int n = read(clientSocket1, &buffer, sizeof(buffer));
         if (n == -1) {
-            throw "Error in writing to socket";
+            throw "Error reading from socket";
         }
-        int clientSocket2 = accept(serverSocket, (struct
-                sockaddr *)&clientAddress, &clientAddressLen);
+       // using namespace boost::algorithm;
 
+        istringstream buf(buffer);
+        istream_iterator<std::string> beg(buf), end;
+        std::vector<string> tokens(beg, end);
 
-        char msg2 [MAX_MSG_LEN] = "Connected successfully";
+        string command = tokens.at(0);
+        tokens.erase(tokens.begin());
 
-        n = write(clientSocket2, &msg2, sizeof(msg2));
-        cout << "Client connected" << endl;
-        if (clientSocket2 == -1) {
-            throw "Error on accept";
-        }
+        commandsManager.executeCommand(command, tokens);
 
-        handleClients(clientSocket1, clientSocket2);
-        // Close communication with the client
-        close(clientSocket1);
-        close(clientSocket2);
+//        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
+//
+//        int n = write(clientSocket1, &msg1, sizeof(msg1));
+//        if (n == -1) {
+//            throw "Error in writing to socket";
+//        }
+//        int clientSocket2 = accept(serverSocket, (struct
+//                sockaddr *)&clientAddress, &clientAddressLen);
+//
+//
+//        char msg2 [MAX_MSG_LEN] = "Connected successfully";
+//
+//        n = write(clientSocket2, &msg2, sizeof(msg2));
+//        cout << "Client connected" << endl;
+//        if (clientSocket2 == -1) {
+//            throw "Error on accept";
+//        }
+//
+//        handleClients(clientSocket1, clientSocket2);
+//        // Close communication with the client
+//        close(clientSocket1);
+//        close(clientSocket2);
     }
 }
 
@@ -187,6 +208,13 @@ bool Server::isNoMoveMessage(int *buffer) {
     return false;
 }
 
-map <string, pthread_t> Server::getPthreadMap() {
-   return this->pthreadMap;
+list<Game>* Server::getGamesList() {
+    return &(this->gamesList);
+}
+
+void Server::addGame(Game game) {
+    this->gamesList.push_back(game);
+}
+Server::~Server() {
+//    delete(this->commandsManager);
 }

@@ -7,7 +7,9 @@
 #include <string>
 #include <map>
 #include <list>
-
+#include "Game.h"
+#include "CommandsManager.h"
+class CommandsManager;
 using namespace std;
 
 class Server {
@@ -37,13 +39,20 @@ public:
      * @return - boolean
      */
     bool isNoMoveMessage(int *buffer);
-    map <string, pthread_t> getPthreadMap();
+//    map <string, pthread_t> getPthreadMap();
+
+    list<Game>* getGamesList();
+
+    void addGame(Game game);
+    ~Server();
 private:
     int port;
     int serverSocket; // the socket's file descriptor
     void handleClients(int clientSocket1, int clientSocket2);
-    list <pthread_t> pthreadList;
-    map <string, pthread_t> pthreadMap;
+    list<Game> gamesList;
+//    CommandsManager* commandsManager;
+//    list <pthread_t> pthreadList;
+//    map <string, pthread_t> pthreadMap;
 
 };
 

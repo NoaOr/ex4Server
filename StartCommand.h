@@ -8,11 +8,11 @@
 
 #include "Command.h"
 
-class StartCommand : public Command{
+class StartCommand : public Command {
 public:
-    StartCommand (Server* server);
+    StartCommand (Server *server);
     virtual void execute(vector<string> args);
-    ~StartCommand() {};
+    ~StartCommand();
 
 };
 

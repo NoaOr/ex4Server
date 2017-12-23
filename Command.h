@@ -5,20 +5,21 @@
 #ifndef EX4SERVER_COMMAND_H
 #define EX4SERVER_COMMAND_H
 
-
+class Server;
 #include <vector>
 #include <string>
 #include "Server.h"
 
+
 using namespace std;
 class Command {
 public:
-    virtual Command(Server* server);
+    Command(Server *server);
     virtual void execute(vector<string> args) = 0;
-    virtual ~Command() {};
+    ~Command();
 
 protected:
-    Server* server;
+    Server *server;
 };
 
 #endif //EX4SERVER_COMMAND_H

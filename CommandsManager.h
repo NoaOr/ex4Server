@@ -5,16 +5,22 @@
 #ifndef EX4SERVER_COMMANDSMANAGER_H
 #define EX4SERVER_COMMANDSMANAGER_H
 
-
+class Command;
+class Server;
 #include <map>
 #include "Command.h"
+#include "Server.h"
+//#include "StartCommand.h"
+//#include "JoinCommand.h"
+//#include "ListGamesCommand.h"
+
 
 class CommandsManager {
 public:
-    CommandsManager();
+    CommandsManager(Server *server);
     ~CommandsManager();
-    void executeCommand(string command,
-                        vector<string> args);
+    // the first arg is client socket
+    void executeCommand(string command, vector<string> args);
 private:
     map<string, Command *> commandsMap;
 };

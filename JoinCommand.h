@@ -30,7 +30,7 @@ public:
      */
     bool isNoMoveMessage(int *buffer);
     ~JoinCommand() {};
-    static void * executeRoutine(void *obj);
+    static void * excecuteRoutine(void *obj);
 
 private:
     vector<int>sockets;

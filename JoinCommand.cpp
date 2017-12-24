@@ -9,7 +9,10 @@
 
 JoinCommand ::JoinCommand(Server *server) : Command(server){}
 
-
+void* JoinCommand::executeRoutine(void *obj) {
+    JoinCommand *ptr = (JoinCommand*)obj;
+    ptr->startRoutine((void*)&ptr->sockets);
+}
 void* JoinCommand::startRoutine(void* args) {
     vector<int>* sockets = (vector<int>*) args;
     int clientSocket1 = (*sockets).at(0);
@@ -118,7 +121,7 @@ void JoinCommand::execute(vector<string> args) {
     Game *game;
     list<Game> *games = this->server->getGamesList();
     string gameName = args.at(1);
-    list<Game> :: iterator it;
+    list<Game>::iterator it;
     for (it = games->begin(); it != games->end(); ++it) {
 //        if (strcmp(it->getGameName(), gameName) == 0) {
         if (it->getGameName() == gameName) {
@@ -137,13 +140,10 @@ void JoinCommand::execute(vector<string> args) {
     int clientSocket1 = game->getClientSocket();
     sockets.push_back(clientSocket1);
     sockets.push_back(clientSocket2);
-    pthread_create(game->getPthreadAddress(), NULL, this->startRoutine,(void*)&sockets);
+    this->sockets = sockets;
+    pthread_create(game->getPthreadAddress(), NULL, executeRoutine, (void*)(this));
 
 }
-
-
-
-
 
 bool JoinCommand::isEndMessage(int *buffer) {
     char *str = (char*) buffer;

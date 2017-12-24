@@ -15,7 +15,7 @@
 class JoinCommand : public Command {
 public:
     JoinCommand (Server *server);
-    virtual void execute(vector<string> args);
+    void execute(vector<string> args);
     void* startRoutine(void* sockets);
     /**
      * This function checks if the received message is an end message
@@ -30,7 +30,10 @@ public:
      */
     bool isNoMoveMessage(int *buffer);
     ~JoinCommand() {};
+    static void * executeRoutine(void *obj);
 
+private:
+    vector<int>sockets;
 };
 
 

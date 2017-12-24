@@ -9,6 +9,9 @@
 #include <iterator>
 #include <sstream>
 #include "Server.h"
+//#include <stdlib.h>
+//#include <cstring>
+//#include <cstdlib>
 using namespace std;
 
 #define MAX_CONNECTED_CLIENTS 2
@@ -60,14 +63,27 @@ void Server::start() {
         }
        // using namespace boost::algorithm;
 
+
         istringstream buf(buffer);
         istream_iterator<std::string> beg(buf), end;
         std::vector<string> tokens(beg, end);
 
         string command = tokens.at(0);
-        tokens.erase(tokens.begin());
-
+        // tokens.erase(tokens.begin());
+        ostringstream oss;
+        oss << clientSocket1;
+        string str = oss.str();
+        tokens.insert(tokens.begin(), str);
         commandsManager.executeCommand(command, tokens);
+//        istringstream buf(buffer);
+//        istream_iterator<std::string> beg(buf), end;
+//        std::vector<string> tokens(beg, end);
+//
+//        string command = tokens.at(0);
+//        tokens.erase(tokens.begin());
+//        tokens.insert(tokens.begin(), (clientSocket1));
+//
+//        commandsManager.executeCommand(command, tokens);
 
 //        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
 //

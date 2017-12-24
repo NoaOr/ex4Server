@@ -9,6 +9,10 @@
 
 JoinCommand ::JoinCommand(Server *server) : Command(server){}
 
+void* JoinCommand::excecuteRoutine(void *obj) {
+    JoinCommand *ptr = (JoinCommand*)obj;
+    ptr->startRoutine((void*)&ptr->sockets);
+}
 
 void* JoinCommand::startRoutine(void* args) {
     vector<int>* sockets = (vector<int>*) args;
@@ -24,8 +28,16 @@ void* JoinCommand::startRoutine(void* args) {
     int firstTurnBuff[2];
     firstTurnBuff[0] = -1;
     firstTurnBuff[1] = -1;
+    char msg2 [MAX_MSG_LEN] = "Connected successfully";
+
+       ssize_t n = write(clientSocket2, &msg2, sizeof(msg2));
+        cout << "Client connected" << endl;
+        if (clientSocket2 == -1) {
+            throw "Error on accept";
+        }
     // writing the value to each player
-    ssize_t n = write(clientSocket1, &value1, sizeof(value1));
+
+    n = write(clientSocket1, &value1, sizeof(value1));
     if (n == -1) {
         throw "Error writing to socket";
     }
@@ -137,7 +149,8 @@ void JoinCommand::execute(vector<string> args) {
     int clientSocket1 = game->getClientSocket();
     sockets.push_back(clientSocket1);
     sockets.push_back(clientSocket2);
-    pthread_create(game->getPthreadAddress(), NULL, this->startRoutine,(void*)&sockets);
+    this->sockets = sockets;
+    pthread_create(game->getPthreadAddress(), NULL, excecuteRoutine,(void*)this);
 
 }
 

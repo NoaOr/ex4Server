@@ -23,7 +23,8 @@ Server::Server(int port): port(port), serverSocket(0) {
 }
 void Server::start() {
     CommandsManager commandsManager = CommandsManager(this);
-    string buffer;
+//    string buffer;
+    char buffer[MAX_MSG_LEN];
     // Create a socket point
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -58,16 +59,33 @@ void Server::start() {
         if (n == -1) {
             throw "Error reading from socket";
         }
+        string strBuff(buffer);
        // using namespace boost::algorithm;
 
-        istringstream buf(buffer);
+
+        istringstream buf(strBuff);
         istream_iterator<std::string> beg(buf), end;
         std::vector<string> tokens(beg, end);
 
         string command = tokens.at(0);
-        tokens.erase(tokens.begin());
-
+         tokens.erase(tokens.begin());
+        ostringstream oss;
+        oss << clientSocket1;
+        string str = oss.str();
+        tokens.insert(tokens.begin(), str);
         commandsManager.executeCommand(command, tokens);
+
+
+
+//
+//        istringstream buf(strBuff);
+//        istream_iterator<std::string> beg(buf), end;
+//        std::vector<string> tokens(beg, end);
+//
+//        string command = tokens.at(0);
+//        tokens.erase(tokens.begin());
+//
+//        commandsManager.executeCommand(command, tokens);
 
 //        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
 //

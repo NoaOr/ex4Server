@@ -9,11 +9,11 @@
 
 JoinCommand ::JoinCommand(Server *server) : Command(server){}
 
-
-void* JoinCommand::executeRoutine(void *obj) {
+void* JoinCommand::excecuteRoutine(void *obj) {
     JoinCommand *ptr = (JoinCommand*)obj;
     ptr->startRoutine((void*)&ptr->sockets);
 }
+
 void* JoinCommand::startRoutine(void* args) {
     vector<int>* sockets = (vector<int>*) args;
     int clientSocket1 = (*sockets).at(0);
@@ -132,7 +132,6 @@ void JoinCommand::execute(vector<string> args) {
     string gameName = args.at(1);
     list<Game>::iterator it;
     for (it = games->begin(); it != games->end(); ++it) {
-//        if (strcmp(it->getGameName(), gameName) == 0) {
         if (it->getGameName() == gameName) {
             isGameFound = true;
             //game = &(*it);
@@ -144,6 +143,7 @@ void JoinCommand::execute(vector<string> args) {
         return;
     }
     game = &(*it);
+    game->setStatus(Game::run);
     vector<int> sockets = vector<int>();
     int clientSocket2 = atoi(args.at(0).c_str());
     int clientSocket1 = game->getClientSocket();
@@ -151,7 +151,11 @@ void JoinCommand::execute(vector<string> args) {
     sockets.push_back(clientSocket2);
     this->sockets = sockets;
 
-    pthread_create(game->getPthreadAddress(), NULL, excecuteRoutine,(void*)this);
+    int rc = pthread_create(game->getPthreadAddress(), NULL, excecuteRoutine,(void*)this);
+    if (rc) {
+        cout << "Error: unable to create thread, " << rc << endl;
+        exit(-1);
+    }
 }
 
 bool JoinCommand::isEndMessage(int *buffer) {

@@ -8,6 +8,7 @@ Game::Game(string gameName, int clientSocket1) {
     this->gameName = gameName;
     this->clientSocket1 = clientSocket1;
     this->pthread = 0;
+    this->status = Game::waiting;
 }
 
 string Game::getGameName() const {
@@ -20,4 +21,10 @@ pthread_t* Game::getPthreadAddress() {
 
 int Game::getClientSocket() const {
     return this->clientSocket1;
+}
+Game::Status Game::getStatus() {
+    return this->status;
+}
+void Game::setStatus(Status newStatus) {
+    this->status = newStatus;
 }

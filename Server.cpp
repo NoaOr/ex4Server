@@ -9,14 +9,12 @@
 #include <iterator>
 #include <sstream>
 #include "Server.h"
-//#include <stdlib.h>
-//#include <cstring>
-//#include <cstdlib>
 using namespace std;
 
 #define MAX_CONNECTED_CLIENTS 2
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
+
 
 Server::Server(int port): port(port), serverSocket(0) {
 //    this->pthreadList = list <pthread_t>();
@@ -76,27 +74,7 @@ void Server::start() {
         string str = oss.str();
         tokens.insert(tokens.begin(), str);
         commandsManager.executeCommand(command, tokens);
-//        istringstream buf(buffer);
-//        istream_iterator<std::string> beg(buf), end;
-//        std::vector<string> tokens(beg, end);
-//
-//        string command = tokens.at(0);
-//        tokens.erase(tokens.begin());
-//        tokens.insert(tokens.begin(), (clientSocket1));
-//
-//        commandsManager.executeCommand(command, tokens);
 
-
-
-//
-//        istringstream buf(strBuff);
-//        istream_iterator<std::string> beg(buf), end;
-//        std::vector<string> tokens(beg, end);
-//
-//        string command = tokens.at(0);
-//        tokens.erase(tokens.begin());
-//
-//        commandsManager.executeCommand(command, tokens);
 
 //        char msg1 [MAX_MSG_LEN] = "Waiting for another player to connect...";
 //

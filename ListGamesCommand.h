@@ -7,15 +7,21 @@
 
 
 #include "Command.h"
+#include "Game.h"
 #include <iostream>
+#include <list>
+
 using namespace std;
 class Command;
 
 class ListGamesCommand : public Command {
 public:
-    ListGamesCommand (Server *server);
+    ListGamesCommand (list<Game> *gamesList);
     virtual void execute(vector<string> args);
     ~ListGamesCommand() {};
+
+private:
+    list<Game> *gamesList;
 };
 
 

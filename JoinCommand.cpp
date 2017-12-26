@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include "JoinCommand.h"
 
-JoinCommand ::JoinCommand(Server *server) : Command(server){}
+JoinCommand ::JoinCommand(list<Game> *gamesList){
+    this->gamesList = gamesList;
+}
 
 void* JoinCommand::excecuteRoutine(void *obj) {
     JoinCommand *ptr = (JoinCommand*)obj;
@@ -79,6 +81,8 @@ void* JoinCommand::startRoutine(void* args) {
         }
         if (n == 0) {
             cout << "client disconnected" << endl;
+            close(clientSocket1);
+            close(clientSocket2);
             return stopGame;
         }
 
@@ -97,6 +101,8 @@ void* JoinCommand::startRoutine(void* args) {
         }
         if (n == 0) {
             cout << "client disconnected" << endl;
+            close(clientSocket1);
+            close(clientSocket2);
             return stopGame;
         }
         if (isEndMessage(buffer)) {
@@ -115,29 +121,31 @@ void* JoinCommand::startRoutine(void* args) {
             break;
         }
         if (n == 0) {
+            close(clientSocket1);
+            close(clientSocket2);
             return stopGame;
         }
         player1hasMove = true;
     }
-
+    close(clientSocket1);
+    close(clientSocket2);
 }
 
 
 void JoinCommand::execute(vector<string> args) {
-    //args = clientSocket2, name
     int n;
     bool isGameFound = false;
     Game *game;
-    list<Game> *games = this->server->getGamesList();
     string gameName = args.at(1);
     list<Game>::iterator it;
-    for (it = games->begin(); it != games->end(); ++it) {
+    pthread_mutex_lock(&mtx);
+    for (it = gamesList->begin(); it != gamesList->end(); ++it) {
         if (it->getGameName() == gameName) {
             isGameFound = true;
-            //game = &(*it);
             break;
         }
     }
+    pthread_mutex_unlock(&mtx);
     if (!isGameFound) {
         // לבדוק מה קורה אם המשחק לא קיים
         return;

@@ -16,6 +16,7 @@ public:
     pthread_t* getPthreadAddress();
     void setStatus(Game::Status newStatus);
     Game::Status getStatus();
+    int getPthread();
 
 private:
     string gameName;

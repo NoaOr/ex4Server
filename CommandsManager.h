@@ -8,19 +8,18 @@
 class Command;
 class Server;
 #include <map>
+#include <list>
 #include "Command.h"
-#include "Server.h"
-//#include "StartCommand.h"
-//#include "JoinCommand.h"
-//#include "ListGamesCommand.h"
+#include "Game.h"
 
 
 class CommandsManager {
 public:
-    CommandsManager(Server *server);
+    CommandsManager(list<Game> *gamesList);
     ~CommandsManager();
     // the first arg is client socket
     void executeCommand(string command, vector<string> args);
+
 private:
     map<string, Command *> commandsMap;
 };

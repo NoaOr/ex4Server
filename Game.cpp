@@ -28,3 +28,6 @@ Game::Status Game::getStatus() {
 void Game::setStatus(Status newStatus) {
     this->status = newStatus;
 }
+int Game::getPthread() {
+    return this->pthread;
+}

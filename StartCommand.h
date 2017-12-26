@@ -7,12 +7,15 @@
 
 
 #include "Command.h"
+#include "Game.h"
 
 class StartCommand : public Command {
 public:
-    StartCommand (Server *server);
+    StartCommand (list<Game> *gamesList);
     virtual void execute(vector<string> args);
     ~StartCommand();
+private:
+    list<Game> *gamesList;
 
 };
 

@@ -4,8 +4,7 @@
 
 #include "Command.h"
 
-Command :: Command (Server *server) {
-    this->server = server;
+Command::Command() {
+    pthread_mutex_init(&mtx, NULL);
 }
-Command::~Command() {
-}
+Command::~Command() {}

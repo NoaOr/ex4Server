@@ -6,11 +6,12 @@
 #include "StartCommand.h"
 #include "JoinCommand.h"
 #include "ListGamesCommand.h"
+#include <typeinfo>
 
-CommandsManager::CommandsManager(Server *server) {
-    commandsMap["start"]  = new StartCommand(server);
-    commandsMap["join"] = new JoinCommand(server);
-    commandsMap["list_games"] = new ListGamesCommand(server);
+CommandsManager::CommandsManager(list<Game> *gamesList) {
+    commandsMap["start"]  = new StartCommand(gamesList);
+    commandsMap["join"] = new JoinCommand(gamesList);
+    commandsMap["list_games"] = new ListGamesCommand(gamesList);
 }
 void CommandsManager::executeCommand(string command, vector<string> args) {
     Command *commandObj = commandsMap[command];

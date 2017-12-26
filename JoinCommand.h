@@ -6,7 +6,10 @@
 #define EX4SERVER_JOINCOMMAND_H
 
 
+#include <list>
 #include "Command.h"
+#include "Game.h"
+
 #define MAX_CONNECTED_CLIENTS 2
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
@@ -14,7 +17,7 @@
 
 class JoinCommand : public Command {
 public:
-    JoinCommand (Server *server);
+    JoinCommand (list<Game> *gamesList);
     void execute(vector<string> args);
     void* startRoutine(void* sockets);
     /**
@@ -34,6 +37,7 @@ public:
 
 private:
     vector<int>sockets;
+    list<Game> *gamesList;
 };
 
 

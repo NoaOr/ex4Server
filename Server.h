@@ -9,6 +9,8 @@
 #include <list>
 #include "Game.h"
 #include "CommandsManager.h"
+#include "ClientHandler.h"
+
 class CommandsManager;
 using namespace std;
 
@@ -39,20 +41,16 @@ public:
      * @return - boolean
      */
     bool isNoMoveMessage(int *buffer);
-//    map <string, pthread_t> getPthreadMap();
+    static void * startClosing(void *obj);
+    void closing();
 
-    list<Game>* getGamesList();
 
-    void addGame(Game game);
     ~Server();
 private:
     int port;
     int serverSocket; // the socket's file descriptor
+    ClientHandler clientHandler;
     void handleClients(int clientSocket1, int clientSocket2);
-    list<Game> gamesList;
-//    CommandsManager* commandsManager;
-//    list <pthread_t> pthreadList;
-//    map <string, pthread_t> pthreadMap;
 
 };
 

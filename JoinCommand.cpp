@@ -11,20 +11,33 @@ JoinCommand ::JoinCommand(list<Game> *gamesList){
     this->gamesList = gamesList;
 }
 
-void* JoinCommand::excecuteRoutine(void *arg) {
-    DataStruct *data = (DataStruct*)arg;
-    JoinCommand *ptr = data->obj;
-    ptr->startRoutine(arg);
-}
-
-void* JoinCommand::startRoutine(void* args) {
-
-    DataStruct *data = (DataStruct*)args;
-    int clientSocket1 = data->clientSocket1;
-    int clientSocket2 = data->clientSocket2;
-    Game *game = data->currentGame;
-    string gameName = data->gameName;
-    void * stopGame;
+void JoinCommand::execute(vector<string> args) {
+    bool isGameFound = false;
+    Game *game;
+    string gameName = args.at(1);
+    list<Game>::iterator it;
+    pthread_mutex_lock(&mtx);
+    for (it = gamesList->begin(); it != gamesList->end(); ++it) {
+        if (it->getGameName() == gameName) {
+            isGameFound = true;
+            break;
+        }
+    }
+    game = &(*it);
+    int clientSocket1 = game->getClientSocket1();
+    int clientSocket2 = atoi(args.at(0).c_str());
+    game->setClientSocket2(clientSocket2);
+    game->setStatus(Game::run);
+    pthread_mutex_unlock(&mtx);
+    if (!isGameFound) {
+        char error[MAX_MSG_LEN] = "Invalid name! There is no game with this name.";
+        int n = write(clientSocket2, &error, sizeof(error));
+        if (n == -1) {
+            throw "Error in writing to socket";
+        }
+        close(clientSocket2);
+        return;
+    }
     int value1 = 1, value2= 2;
     bool isFirstTurn = true;
     bool player1hasMove = true;
@@ -77,6 +90,11 @@ void* JoinCommand::startRoutine(void* args) {
             throw "Error reading from socket";
         }
         if (isEndMessage(buffer)) {
+            char endGame[END_SIZE] = "End";
+            n = write(clientSocket2, &endGame, sizeof(endGame));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
             break;
         }
         if (isNoMoveMessage(buffer)) {
@@ -86,7 +104,7 @@ void* JoinCommand::startRoutine(void* args) {
             cout << "client disconnected" << endl;
             close(clientSocket1);
             close(clientSocket2);
-            return stopGame;
+            return;
         }
         n = write(clientSocket2, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -101,15 +119,21 @@ void* JoinCommand::startRoutine(void* args) {
         if (n == -1) {
             throw "Error reading from socket";
         }
+        if (isEndMessage(buffer)) {
+            char endGame[END_SIZE] = "End";
+            n = write(clientSocket2, &endGame, sizeof(endGame));
+            if (n == -1) {
+                throw "Error writing to socket";
+            }
+            break;
+        }
         if (n == 0) {
             cout << "client disconnected" << endl;
             close(clientSocket1);
             close(clientSocket2);
-            return stopGame;
+            return;
         }
-        if (isEndMessage(buffer)) {
-            break;
-        }
+
         if (isNoMoveMessage(buffer) && !player1hasMove) {
             char endGame[END_SIZE] = "End";
             n = write(clientSocket1, &endGame, sizeof(endGame));
@@ -125,61 +149,22 @@ void* JoinCommand::startRoutine(void* args) {
         if (n == 0) {
             close(clientSocket1);
             close(clientSocket2);
-            return stopGame;
+            return;
         }
         player1hasMove = true;
     }
     // delete the game from the list
-    list<Game>::iterator it;
+    list<Game>::iterator iterator1;
     pthread_mutex_lock(&mtx);
-    for (it = gamesList->begin(); it != gamesList->end(); ++it) {
-        if (it->getGameName() == gameName) {
-            gamesList->erase(it);
+    for (iterator1 = gamesList->begin(); iterator1 != gamesList->end(); ++iterator1) {
+        if (iterator1->getGameName() == gameName) {
+            gamesList->erase(iterator1);
             break;
         }
     }
     pthread_mutex_unlock(&mtx);
     close(clientSocket1);
     close(clientSocket2);
-}
-
-void JoinCommand::execute(vector<string> args) {
-    bool isGameFound = false;
-    Game *game;
-    string gameName = args.at(1);
-    list<Game>::iterator it;
-    pthread_mutex_lock(&mtx);
-    for (it = gamesList->begin(); it != gamesList->end(); ++it) {
-        if (it->getGameName() == gameName) {
-            isGameFound = true;
-            break;
-        }
-    }
-    pthread_mutex_unlock(&mtx);
-    if (!isGameFound) {
-        int clientSocket2 = atoi(args.at(0).c_str());
-        char error[MAX_MSG_LEN] = "Invalid name! There is no game with this name.";
-        int n = write(clientSocket2, &error, sizeof(error));
-        if (n == -1) {
-            throw "Error in writing to socket";
-        }
-        close(clientSocket2);
-        return;
-    }
-    game = &(*it);
-    game->setClientSocket2(atoi(args.at(0).c_str()));
-    game->setStatus(Game::run);
-    DataStruct *data = new DataStruct();
-    data->clientSocket1 = game->getClientSocket1();
-    data->clientSocket2 = atoi(args.at(0).c_str());
-    data->gameName = game->getGameName();
-    data->obj = this;
-    data->currentGame = game;
-    int rc = pthread_create(game->getPthreadAddress(), NULL, excecuteRoutine,(void*)data);
-    if (rc) {
-        cout << "Error: unable to create thread, " << rc << endl;
-        exit(-1);
-    }
 }
 
 bool JoinCommand::isEndMessage(int *buffer) {

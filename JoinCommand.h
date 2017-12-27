@@ -30,7 +30,6 @@ public:
      */
     JoinCommand (list<Game> *gamesList);
     void execute(vector<string> args);
-    void* startRoutine(void* sockets);
     /**
      * This function checks if the received message is an end message
      * @param buffer - the buffer
@@ -43,12 +42,6 @@ public:
      * @return - boolean
      */
     bool isNoMoveMessage(int *buffer);
-    /**
-     * The static function to execute the command.
-     * @param obj - void*
-     * @return - void*
-     */
-    static void * excecuteRoutine(void *obj);
     /**
      * Destructor.
      */

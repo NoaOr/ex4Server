@@ -13,10 +13,21 @@
 #define MAX_CONNECTED_CLIENTS 2
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
+class JoinCommand;
 
-
+struct DataStruct {
+    JoinCommand *obj;
+    int clientSocket1;
+    int clientSocket2;
+    string gameName;
+    Game *currentGame;
+};
 class JoinCommand : public Command {
 public:
+    /**
+     * Constructor
+     * @param gamesList - the current list of games.
+     */
     JoinCommand (list<Game> *gamesList);
     void execute(vector<string> args);
     void* startRoutine(void* sockets);
@@ -32,13 +43,25 @@ public:
      * @return - boolean
      */
     bool isNoMoveMessage(int *buffer);
-    ~JoinCommand() {};
+    /**
+     * The static function to execute the command.
+     * @param obj - void*
+     * @return - void*
+     */
     static void * excecuteRoutine(void *obj);
+    /**
+     * The function handles the state of exit message.
+     * @param data - DataStruct - a struct that contains the data of the current game.
+     */
+    void handleExitStatus(DataStruct *data);
+    /**
+     * Destructor.
+     */
+    ~JoinCommand() {};
+
 
 private:
-    vector<int>sockets;
     list<Game> *gamesList;
 };
-
 
 #endif //EX4SERVER_JOINCOMMAND_H

@@ -15,10 +15,22 @@ class Server;
 
 class CommandsManager {
 public:
+    /**
+     * Constructor.
+     * @param gamesList - the current list of games.
+     */
     CommandsManager(list<Game> *gamesList);
-    ~CommandsManager();
     // the first arg is client socket
+    /**
+     * The function executes the command.
+     * @param command - the string of the command.
+     * @param args - vector of strings.
+     */
     void executeCommand(string command, vector<string> args);
+    /**
+     * Destructor.
+     */
+    ~CommandsManager();
 
 private:
     map<string, Command *> commandsMap;

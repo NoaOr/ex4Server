@@ -41,10 +41,19 @@ public:
      * @return - boolean
      */
     bool isNoMoveMessage(int *buffer);
+    /**
+     * The static function for starting the pthread of closing.
+     * @param obj - void *
+     * @return void*
+     */
     static void * startClosing(void *obj);
+    /**
+     * The function closes the threads and ends the game.
+     */
     void closing();
-
-
+    /**
+     * Destructor.
+     */
     ~Server();
 private:
     int port;

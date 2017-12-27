@@ -19,7 +19,10 @@ public:
      * @return the server IP
      */
     string getIP();
-
+    /**
+     *
+     * @return the port.
+     */
     int getPort();
 private:
     string IP;

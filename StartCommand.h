@@ -11,8 +11,19 @@
 
 class StartCommand : public Command {
 public:
+    /**
+     * Constructor
+     * @param gamesList - the current list of games.
+     */
     StartCommand (list<Game> *gamesList);
+    /**
+     * The function executes the command.
+     * @param args - vector of strings.
+     */
     virtual void execute(vector<string> args);
+    /**
+     * Destructor.
+     */
     ~StartCommand();
 private:
     list<Game> *gamesList;

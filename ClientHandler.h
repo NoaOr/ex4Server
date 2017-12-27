@@ -13,11 +13,33 @@ class CommandManager;
 
 class ClientHandler {
 public:
+    /**
+     * Constructor.
+     */
     ClientHandler();
+    /**
+     * The function opens a thread and runs it.
+     * @param clientSocket
+     */
     void run(int clientSocket);
-    static void * routine(void *arg);
+    /**
+     * The static function to create the thread.
+     * @param arg - void*
+     * @return - void*
+     */
+    static void* routine(void *arg);
+    /**
+     * The function starts the routine and handles the client.
+     * @param clientSocket - the socket.
+     */
     void startRoutine (int clientSocket);
+    /**
+     * The function closes all threads.
+     */
     void closeAllThreads();
+    /**
+     * destructor.
+     */
     ~ClientHandler();
 private:
     list<Game> *gamesList;

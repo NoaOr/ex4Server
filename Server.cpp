@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <iterator>
@@ -86,11 +87,11 @@ void* Server::startClosing(void *obj) {
 }
 
 void Server::closing() {
-    string exit;
-    cin >> exit;
-    if (exit == "exit") {
+    string str;
+    cin >> str;
+    if (str == "exit") {
         this->clientHandler.closeAllThreads();
     }
-    exit(0);
+    exit(EXIT_SUCCESS);
 
 }

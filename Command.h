@@ -13,8 +13,18 @@ using namespace std;
 
 class Command {
 public:
+    /**
+     * Constructor.
+     */
     Command();
+    /**
+     * The function executes the command.
+     * @param args
+     */
     virtual void execute(vector<string> args) = 0;
+    /**
+     * Destructor.
+     */
     ~Command();
 
 protected:

@@ -16,8 +16,19 @@ class Command;
 
 class ListGamesCommand : public Command {
 public:
+    /**
+     * Constructor.
+     * @param gamesList - the current list of the game.
+     */
     ListGamesCommand (list<Game> *gamesList);
+    /**
+     * The function executes the command.
+     * @param args - vector of strings.
+     */
     virtual void execute(vector<string> args);
+    /**
+     * Destructor.
+     */
     ~ListGamesCommand() {};
 
 private:

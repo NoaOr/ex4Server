@@ -48,7 +48,7 @@ public:
      *
      * @return the pthread id.
      */
-    int getPthread();
+    pthread_t getPthread();
 
 private:
     string gameName;

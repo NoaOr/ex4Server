@@ -77,6 +77,7 @@ void* JoinCommand::startRoutine(void* args) {
         if (n == -1) {
             throw "Error writing to socket";
         }
+        handleExitStatus(data);
         // read the first client's choice
         n = read(clientSocket1, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -104,6 +105,7 @@ void* JoinCommand::startRoutine(void* args) {
         if (n == -1) {
             throw "Error writing to socket";
         }
+        handleExitStatus(data);
         // read the second client's choice
         n = read(clientSocket2, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -154,23 +156,14 @@ void* JoinCommand::startRoutine(void* args) {
 }
 
 void JoinCommand::handleExitStatus(DataStruct *data) {
-    char buffer[MAX_MSG_LEN] = "The server is about to get closed.";
     Game *game = data->currentGame;
     int clientSocket1 = data->clientSocket1;
     int clientSocket2 = data->clientSocket2;
     if (game->getStatus() == Game::exit) {
-        int n = write (clientSocket1, &buffer, sizeof(buffer));
-        if (n == -1) {
-            throw "Error writing to socket";
-        }
-        n = write (clientSocket2, &buffer, sizeof(buffer));
-        if (n == -1) {
-            throw "Error writing to socket";
-        }
+        close(clientSocket1);
+        close(clientSocket2);
+        pthread_exit(NULL);
     }
-    close(clientSocket1);
-    close(clientSocket2);
-    pthread_exit(NULL);
 }
 
 void JoinCommand::execute(vector<string> args) {

@@ -55,8 +55,12 @@ void ClientHandler::closeAllThreads() {
     void * state;
     list<Game> ::iterator it;
     for (it = gamesList->begin(); it != gamesList->end(); ++it) {
-        it->setStatus(Game::exit);
-        pthread_join(it->getPthread(), &state);
+        if (it->getStatus() == Game::run) {
+            it->setStatus(Game::exit);
+            pthread_join(it->getPthread(), NULL);
+        } else if(it->getStatus() == Game::waiting) {
+            close(it->getClientSocket());
+        }
     }
 }
 ClientHandler::~ClientHandler() {

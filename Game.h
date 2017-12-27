@@ -28,7 +28,13 @@ public:
      *
      * @return the client socket.
      */
-    int getClientSocket() const;
+    int getClientSocket1() const;
+    /**
+     *
+     * @return the client socket.
+     */
+    int getClientSocket2() const;
+    void setClientSocket2(int clientSocket2);
     /**
      *
      * @return the pthread.
@@ -53,6 +59,7 @@ public:
 private:
     string gameName;
     int clientSocket1;
+    int clientSocket2;
     pthread_t pthread;
     Game::Status status;
 };

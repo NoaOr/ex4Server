@@ -42,42 +42,35 @@ void* JoinCommand::startRoutine(void* args) {
         throw "Error on accept";
     }
     // writing the value to each player
-    handleExitStatus(data);
     n = write(clientSocket1, &value1, sizeof(value1));
     if (n == -1) {
         throw "Error writing to socket";
     }
-    handleExitStatus(data);
     n = write(clientSocket2, &value2, sizeof(value2));
     if (n == -1) {
         throw "Error writing to socket";
     }
     while (true) {
         if (isFirstTurn) {
-            handleExitStatus(data);
             n = write(clientSocket1, &firstMsg, sizeof(firstMsg));
             if (n == -1) {
                 throw "Error writing to socket";
             }
-            handleExitStatus(data);
             n = write(clientSocket1, &firstTurnBuff, sizeof(firstTurnBuff));
             if (n == -1) {
                 throw "Error writing to socket";
             }
             isFirstTurn = false;
         } else {
-            handleExitStatus(data);
             n = write(clientSocket1, &buffer, sizeof(buffer));
             if (n == -1) {
                 throw "Error writing to socket";
             }
         }
-        handleExitStatus(data);
         n = write(clientSocket2, &waitingMsg, sizeof(waitingMsg));
         if (n == -1) {
             throw "Error writing to socket";
         }
-        handleExitStatus(data);
         // read the first client's choice
         n = read(clientSocket1, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -95,17 +88,14 @@ void* JoinCommand::startRoutine(void* args) {
             close(clientSocket2);
             return stopGame;
         }
-        handleExitStatus(data);
         n = write(clientSocket2, &buffer, sizeof(buffer));
         if (n == -1) {
             throw "Error writing to socket";
         }
-        handleExitStatus(data);
         n = write(clientSocket1, &waitingMsg, sizeof(waitingMsg));
         if (n == -1) {
             throw "Error writing to socket";
         }
-        handleExitStatus(data);
         // read the second client's choice
         n = read(clientSocket2, &buffer, sizeof(buffer));
         if (n == -1) {
@@ -122,12 +112,10 @@ void* JoinCommand::startRoutine(void* args) {
         }
         if (isNoMoveMessage(buffer) && !player1hasMove) {
             char endGame[END_SIZE] = "End";
-            handleExitStatus(data);
             n = write(clientSocket1, &endGame, sizeof(endGame));
             if (n == -1) {
                 throw "Error writing to socket";
             }
-            handleExitStatus(data);
             n = write(clientSocket2, &endGame, sizeof(endGame));
             if (n == -1) {
                 throw "Error writing to socket";
@@ -155,17 +143,6 @@ void* JoinCommand::startRoutine(void* args) {
     close(clientSocket2);
 }
 
-void JoinCommand::handleExitStatus(DataStruct *data) {
-    Game *game = data->currentGame;
-    int clientSocket1 = data->clientSocket1;
-    int clientSocket2 = data->clientSocket2;
-    if (game->getStatus() == Game::exit) {
-        close(clientSocket1);
-        close(clientSocket2);
-        pthread_exit(NULL);
-    }
-}
-
 void JoinCommand::execute(vector<string> args) {
     bool isGameFound = false;
     Game *game;
@@ -180,13 +157,20 @@ void JoinCommand::execute(vector<string> args) {
     }
     pthread_mutex_unlock(&mtx);
     if (!isGameFound) {
-        // לבדוק מה קורה אם המשחק לא קיים
+        int clientSocket2 = atoi(args.at(0).c_str());
+        char error[MAX_MSG_LEN] = "Invalid name! There is no game with this name.";
+        int n = write(clientSocket2, &error, sizeof(error));
+        if (n == -1) {
+            throw "Error in writing to socket";
+        }
+        close(clientSocket2);
         return;
     }
     game = &(*it);
+    game->setClientSocket2(atoi(args.at(0).c_str()));
     game->setStatus(Game::run);
     DataStruct *data = new DataStruct();
-    data->clientSocket1 = game->getClientSocket();
+    data->clientSocket1 = game->getClientSocket1();
     data->clientSocket2 = atoi(args.at(0).c_str());
     data->gameName = game->getGameName();
     data->obj = this;

@@ -50,11 +50,6 @@ public:
      */
     static void * excecuteRoutine(void *obj);
     /**
-     * The function handles the state of exit message.
-     * @param data - DataStruct - a struct that contains the data of the current game.
-     */
-    void handleExitStatus(DataStruct *data);
-    /**
      * Destructor.
      */
     ~JoinCommand() {};

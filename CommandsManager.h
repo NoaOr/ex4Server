@@ -26,7 +26,7 @@ public:
      * @param command - the string of the command.
      * @param args - vector of strings.
      */
-    void executeCommand(string command, vector<string> args);
+    bool executeCommand(string command, vector<string> args);
     /**
      * Destructor.
      */

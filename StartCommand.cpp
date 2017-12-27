@@ -34,7 +34,7 @@ void StartCommand :: execute(vector<string> args) {
         if (n == -1) {
             throw "Error in writing to socket";
         }
-       // close(clientSocket);
+        close(clientSocket);
         return;
     }
 
@@ -48,5 +48,4 @@ void StartCommand :: execute(vector<string> args) {
     if (n == -1) {
         throw "Error in writing to socket";
     }
-    //close(clientSocket);
 }

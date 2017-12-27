@@ -49,17 +49,21 @@ void ClientHandler::startRoutine(int clientSocket) {
     oss << clientSocket;
     string str = oss.str();
     tokens.insert(tokens.begin(), str);
-    this->commandsManager->executeCommand(command, tokens);
+    bool result = this->commandsManager->executeCommand(command, tokens);
+    if(result == false) {
+        close(clientSocket);
+    }
 }
 void ClientHandler::closeAllThreads() {
     void * state;
     list<Game> ::iterator it;
     for (it = gamesList->begin(); it != gamesList->end(); ++it) {
         if (it->getStatus() == Game::run) {
-            it->setStatus(Game::exit);
-            pthread_join(it->getPthread(), NULL);
+            close(it->getClientSocket1());
+            close(it->getClientSocket2());
+            pthread_cancel(it->getPthread());
         } else if(it->getStatus() == Game::waiting) {
-            close(it->getClientSocket());
+            close(it->getClientSocket1());
         }
     }
 }

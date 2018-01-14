@@ -24,8 +24,7 @@ void ClientHandler::run(int clientSocket) {
         cout << "Error: unable to create thread, " << rc << endl;
         exit(-1);
     }
-   // pthread_exit(NULL);
-}
+  }
 
 void* ClientHandler::routine(void *arg) {
     Data *data = (Data*)arg;

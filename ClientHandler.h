@@ -21,7 +21,7 @@ public:
      * The function opens a thread and runs it.
      * @param clientSocket
      */
-    void run(int clientSocket);
+//    void run(int clientSocket);
     /**
      * The static function to create the thread.
      * @param arg - void*
@@ -32,7 +32,7 @@ public:
      * The function starts the routine and handles the client.
      * @param clientSocket - the socket.
      */
-    void startRoutine (int clientSocket);
+    void run(int clientSocket);
     /**
      * The function closes all threads.
      */

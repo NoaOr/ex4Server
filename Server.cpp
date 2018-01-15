@@ -10,14 +10,32 @@
 #include <iterator>
 #include <sstream>
 #include "Server.h"
+#include "ThreadPool.h"
+
 using namespace std;
 
 #define MAX_CONNECTED_CLIENTS 2
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
+#define THREADS_NUM 5
+#define TASKS_NUM 5
 
-
-Server::Server(int port): port(port), serverSocket(0), clientHandler() {}
+Server::Server(int port): port(port), serverSocket(0), clientHandler() {
+    this->pool = new ThreadPool (THREADS_NUM);
+//    Task *tasks[TASKS_NUM];
+//    for (int i = 0; i < TASKS_NUM; i++) {
+////        tasks[i] = new Task(print, (void *)i);
+////        pool.addTask(tasks[i]);
+//    }
+//    char ch;
+//    cout << "Type a char to exit" << endl;
+//    cin >> ch;
+//    pool.terminate();
+//    for (int i = 0; i < TASKS_NUM; i++) {
+//        delete tasks[i];
+//    }
+//    cout << "End of main" << endl;
+}
 
 void Server::start() {
 
@@ -55,8 +73,18 @@ void Server::start() {
         if (clientSocket1 == -1) {
             throw "Error on accept";
         }
-        this->clientHandler.run(clientSocket1);
+        Data* data = new Data();
+        data->clientHandler = &this->clientHandler;
+        data->clientSocket = clientSocket1;
+        this->pool->addTask(new Task(this->runClientHandler, (void*)data));
+    //    this->clientHandler.run(clientSocket1);
     }
+}
+
+void * Server:: runClientHandler(void *data) {
+    Data* data1 = (Data*)data;
+    int clientSocket1  = data1->clientSocket;
+    data1->clientHandler->run(clientSocket1);
 }
 
 

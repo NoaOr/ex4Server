@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "CommandsManager.h"
 #include "ClientHandler.h"
+#include "ThreadPool.h"
 
 class CommandsManager;
 using namespace std;
@@ -51,6 +52,7 @@ public:
      * The function closes the threads and ends the game.
      */
     void closing();
+    static void * runClientHandler(void *clientSocket);
     /**
      * Destructor.
      */
@@ -59,8 +61,8 @@ private:
     int port;
     int serverSocket; // the socket's file descriptor
     ClientHandler clientHandler;
+    ThreadPool* pool;
     void handleClients(int clientSocket1, int clientSocket2);
-
 };
 
 

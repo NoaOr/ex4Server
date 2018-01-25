@@ -14,12 +14,11 @@
 
 using namespace std;
 
-#define MAX_CONNECTED_CLIENTS 2
+#define MAX_CONNECTED_CLIENTS 10
 #define MAX_MSG_LEN 300
 #define END_SIZE 4
-#define THREADS_NUM 5
-#define TASKS_NUM 5
-
+#define THREADS_NUM 2
+#define TASKS_NUM 10
 Server::Server(int port): port(port), serverSocket(0), clientHandler() {
     this->pool = new ThreadPool (THREADS_NUM);
 //    Task *tasks[TASKS_NUM];
@@ -119,7 +118,9 @@ void Server::closing() {
     cin >> str;
     if (str == "exit") {
         this->clientHandler.closeAllThreads();
+            this->pool->terminate();
     }
+    delete(this->pool);
     exit(EXIT_SUCCESS);
 
 }

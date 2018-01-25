@@ -3,3 +3,6 @@
 //
 
 #include "Task.h"
+ Task::~Task() {
+     delete(this->arg);
+ }

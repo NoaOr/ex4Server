@@ -13,25 +13,6 @@ ClientHandler::ClientHandler() {
     this->commandsManager = new CommandsManager(this->gamesList);
 }
 
-
-//void ClientHandler::run(int clientSocket) {
-//    pthread_t pthread;
-//    Data *data = new Data();
-//    data->clientHandler = this;
-//    data->clientSocket = clientSocket;
-//    int rc = pthread_create(&pthread, NULL, routine, (void*)data);
-//    if (rc) {
-//        cout << "Error: unable to create thread, " << rc << endl;
-//        exit(-1);
-//    }
-//  }
-
-//void* ClientHandler::routine(void *arg) {
-//    Data *data = (Data*)arg;
-//    ClientHandler *ptr = data->clientHandler;
-//    ptr->run(data->clientSocket);
-//}
-
 void ClientHandler::run(int clientSocket) {
     char buffer[MAX_MSG_LEN];
     int n = read(clientSocket, &buffer, sizeof(buffer));
